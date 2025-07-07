@@ -7,10 +7,15 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
-      margin: 2rem;
+      margin: 0;
       background: #f5f7fa;
       color: #333;
       line-height: 1.6;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
     }
     header {
       margin-bottom: 2rem;
@@ -36,42 +41,45 @@
       font-size: 0.9rem;
       color: #777;
       border-top: 1px solid #ddd;
-      padding-top: 1rem;
+      padding: 1rem;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>AssetOpsBench</h1>
-    <p><em>Benchmarking AI Agents for Task Automation in Industrial Asset Operations and Maintenance</em></p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>AssetOpsBench</h1>
+      <p><em>Benchmarking AI Agents for Task Automation in Industrial Asset Operations and Maintenance</em></p>
+    </header>
 
-  <main>
-    <section>
-      <h2>About AssetOpsBench</h2>
-      <p><strong>AssetOpsBench</strong> provides a benchmarking suite for evaluating AI agents in industrial asset management. It covers realistic scenarios like asset investment planning, maintenance task automation, and condition monitoring workflows.</p>
-    </section>
+    <main>
+      <section>
+        <h2>About AssetOpsBench</h2>
+        <p><strong>AssetOpsBench</strong> provides a benchmarking suite for evaluating AI agents in industrial asset management. It covers realistic scenarios like asset investment planning, maintenance task automation, and condition monitoring workflows.</p>
+      </section>
 
-    <section>
-      <h2>Get Started</h2>
-      <p>Check out the <a href="https://github.com/IBM/AssetOpsBench">GitHub repository</a> for installation instructions, datasets, and evaluation scripts.</p>
-    </section>
+      <section>
+        <h2>Get Started</h2>
+        <p>Check out the <a href="https://github.com/IBM/AssetOpsBench">GitHub repository</a> for installation instructions, datasets, and evaluation scripts.</p>
+      </section>
 
-    <section>
-      <h2>Documentation</h2>
-      <p>Please refer to the <a href="https://github.com/IBM/AssetOpsBench#readme">README.md</a> for detailed usage, contributing guidelines, and more.</p>
-    </section>
+      <section>
+        <h2>Documentation</h2>
+        <p>Please refer to the <a href="https://github.com/IBM/AssetOpsBench#readme">README.md</a> for detailed usage, contributing guidelines, and more.</p>
+      </section>
 
-    <section>
-      <h2>Resources</h2>
-      <ul>
-        <li><a href="https://github.com/IBM/AssetOpsBench/issues">Report an Issue</a></li>
-        <li><a href="https://github.com/IBM/AssetOpsBench/pulls">Submit a Pull Request</a></li>
-        <li><a href="https://ibm.github.io/AssetOpsBench/">GitHub Pages Site (you’re here!)</a></li>
-        <li><a href="scenario_generation.html">Scenario Authoring Guide</a></li>
-      </ul>
-    </section>
-      </main>
+      <section>
+        <h2>Resources for Contributions</h2>
+        <ul>
+          <li><a href="https://github.com/IBM/AssetOpsBench/issues">Report an Issue</a></li>
+          <li><a href="https://github.com/IBM/AssetOpsBench/pulls">Submit a Pull Request</a></li>
+          <li><a href="https://ibm.github.io/AssetOpsBench/">GitHub Pages Site (you’re here!)</a></li>
+          <li><a href="scenario_generation.html">Scenario Authoring Guide</a></li>
+        </ul>
+      </section>
+    </main>
+  </div>
 
   <footer>
     &copy; 2025 IBM. Project hosted on <a href="https://github.com/IBM/AssetOpsBench">GitHub</a>.
