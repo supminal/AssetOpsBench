@@ -7,11 +7,15 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
-      margin: 2rem;
+      margin: 0;
       background: #f5f7fa;
       color: #333;
       line-height: 1.6;
+    }
+    .container {
       max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
     }
     header {
       margin-bottom: 2rem;
@@ -48,27 +52,29 @@
       font-size: 0.9rem;
       color: #777;
       border-top: 1px solid #ddd;
-      padding-top: 1rem;
+      padding: 1rem;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Scenario Authoring Guide</h1>
-    <p><em>How to add and structure scenarios for AssetOpsBench evaluation</em></p>
-  </header>
+  <div class="container">
+    <header>
+      <h1>Scenario Authoring Guide</h1>
+      <p><em>How to add and structure scenarios for AssetOpsBench evaluation</em></p>
+    </header>
 
-  <main>
-    <section>
-      <h2>✅ What is a Scenario?</h2>
-      <p>A scenario is a JSON object representing a prompt, question, or analysis task used for benchmarking AI agents. Each scenario is self-contained and includes metadata, input text, and the expected response in <code>characteristic_form</code>.</p>
-    </section>
+    <main>
+      <section>
+        <h2>✅ What is a Scenario?</h2>
+        <p>A scenario is a JSON object representing a prompt, question, or analysis task used for benchmarking AI agents. Each scenario is self-contained and includes metadata, input text, and the expected response in <code>characteristic_form</code>.</p>
+      </section>
 
-    <section>
-      <h2>🗂 Example Scenario Entries</h2>
+      <section>
+        <h2>🗂 Example Scenario Entries</h2>
 
-      <h3>📌 Asset Condition Insight Scenario</h3>
-      <pre>{
+        <h3>📌 Asset Condition Insight Scenario</h3>
+        <pre>{
   "id": 1000,
   "file": "Air Handling Unit_615152AC_insights_prompt.txt",
   "text": "You are an expert in Air Handling Unit maintenance and reliability analysis. Your task is to analyze provided asset_details_facts and workorder_facts...",
@@ -78,8 +84,8 @@
   "characteristic_form": "The expected condition of the asset is either Normal or Needs Attention."
 }</pre>
 
-      <h3>📌 Knowledge Query Scenario</h3>
-      <pre>{
+        <h3>📌 Knowledge Query Scenario</h3>
+        <pre>{
   "id": 1,
   "type": "IoT",
   "text": "What IoT sites are available?",
@@ -87,36 +93,36 @@
   "deterministic": true,
   "characteristic_form": "The expected response should be the return value of all sites, either as text or as a reference to a file."
 }</pre>
-    </section>
+      </section>
 
-    <section>
-      <h2>🔑 Field Descriptions</h2>
-      <table>
-        <tr><th>Field</th><th>Description</th></tr>
-        <tr><td><code>id</code></td><td>Unique numeric identifier for the scenario; must be unique across scenarios.</td></tr>
-        <tr><td><code>file</code></td><td>(Optional) Filename if the scenario prompt is stored externally.</td></tr>
-        <tr><td><code>text</code></td><td>Prompt or question text.</td></tr>
-        <tr><td><code>type</code></td><td>Scenario type/domain, e.g., "IoT" or "condition insight".</td></tr>
-        <tr><td><code>category</code></td><td>High-level grouping, such as "Knowledge Query" or "Asset Analysis".</td></tr>
-        <tr><td><code>deterministic</code></td><td><code>true</code> if only one expected correct response; <code>false</code> or omitted for open-ended prompts.</td></tr>
-        <tr><td><code>characteristic_form</code></td><td>Expected response summary; used for automated accuracy checks.</td></tr>
-      </table>
-    </section>
+      <section>
+        <h2>🔑 Field Descriptions</h2>
+        <table>
+          <tr><th>Field</th><th>Description</th></tr>
+          <tr><td><code>id</code></td><td>Unique numeric identifier for the scenario; must be unique across scenarios.</td></tr>
+          <tr><td><code>file</code></td><td>(Optional) Filename if the scenario prompt is stored externally.</td></tr>
+          <tr><td><code>text</code></td><td>Prompt or question text.</td></tr>
+          <tr><td><code>type</code></td><td>Scenario type/domain, e.g., "IoT" or "condition insight".</td></tr>
+          <tr><td><code>category</code></td><td>High-level grouping, such as "Knowledge Query" or "Asset Analysis".</td></tr>
+          <tr><td><code>deterministic</code></td><td><code>true</code> if only one expected correct response; <code>false</code> or omitted for open-ended prompts.</td></tr>
+          <tr><td><code>characteristic_form</code></td><td>Expected response summary; used for automated accuracy checks.</td></tr>
+        </table>
+      </section>
 
-    <section>
-      <h2>➕ How to Add a New Scenario</h2>
-      <ol>
-        <li>Create a new entry in your JSON file following the examples above.</li>
-        <li>Assign a <strong>unique <code>id</code></strong>.</li>
-        <li>Provide a clear <code>text</code> prompt or question.</li>
-        <li>Specify the expected response in <code>characteristic_form</code>.</li>
-        <li>Save your JSON file and commit it to your repo.</li>
-      </ol>
-    </section>
+      <section>
+        <h2>➕ How to Add a New Scenario</h2>
+        <ol>
+          <li>Create a new entry in your JSON file following the examples above.</li>
+          <li>Assign a <strong>unique <code>id</code></strong>.</li>
+          <li>Provide a clear <code>text</code> prompt or question.</li>
+          <li>Specify the expected response in <code>characteristic_form</code>.</li>
+          <li>Save your JSON file and commit it to your repo.</li>
+        </ol>
+      </section>
 
-    <section>
-      <h2>🐍 Developer Template: <code>scenario_template.py</code></h2>
-      <pre>import json
+      <section>
+        <h2>🐍 Developer Template: <code>scenario_template.py</code></h2>
+        <pre>import json
 
 def create_scenario():
     scenario = {
@@ -135,18 +141,19 @@ def create_scenario():
 
 if __name__ == "__main__":
     create_scenario()</pre>
-    </section>
+      </section>
 
-    <section>
-      <h2>✅ Best Practices</h2>
-      <ul>
-        <li>Validate new scenarios using your evaluation pipeline.</li>
-        <li>For asset-focused prompts, include sufficient details in <code>text</code>.</li>
-        <li>For knowledge queries, keep the question concise and unambiguous.</li>
-        <li>Ensure your <code>characteristic_form</code> is accurate and directly tied to your prompt.</li>
-      </ul>
-    </section>
-  </main>
+      <section>
+        <h2>✅ Best Practices</h2>
+        <ul>
+          <li>Validate new scenarios using your evaluation pipeline.</li>
+          <li>For asset-focused prompts, include sufficient details in <code>text</code>.</li>
+          <li>For knowledge queries, keep the question concise and unambiguous.</li>
+          <li>Ensure your <code>characteristic_form</code> is accurate and directly tied to your prompt.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
 
   <footer>
     &copy; 2025 IBM. Part of <a href="index.html">AssetOpsBench</a>.
