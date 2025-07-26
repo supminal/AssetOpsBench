@@ -34,11 +34,19 @@ Additional Information
 Failure Information:
 The dataset is unlabeled, but the failure reports provided by the company are available in the following table. This allows for evaluating the effectiveness of anomaly detection, failure prediction, and RUL estimation algorithms.
 
-Nr.     Start Time	          End Time	                 Failure	      Severity	         Report
-#1	4/18/2020 0:00	   4/18/2020 23:59       Air leak	    High stress	
-#1	5/29/2020 23:30     5/30/2020 6:00	    Air Leak	    High stress	Maintenance on 30Apr at 12:00
-#3	6/5/2020 10:00	   6/7/2020 14:30	        Air Leak	    High stress	Maintenance on 8Jun at 16:00
-#4	7/15/2020 14:30     7/15/2020 19:00      Air Leak	    High stress	Maintenance on 16Jul at 00:00
+# Compressor Failure Log and Scenario Metadata (UCI Dataset)
+
+This table summarizes the failure events and corresponding metadata used to generate situational reasoning scenarios in AssetOpsBench.
+
+## 🔧 Failure Event Table
+
+| Nr. | Start Time         | End Time           | Failure    | Severity     | Maintenance Report                |
+|-----|--------------------|--------------------|------------|--------------|----------------------------------|
+| #1  | 2020-04-18 00:00   | 2020-04-18 23:59   | Air Leak   | High Stress  | —                                |
+| #2  | 2020-05-29 23:30   | 2020-05-30 06:00   | Air Leak   | High Stress  | Maintenance on 2020-04-30 12:00 |
+| #3  | 2020-06-05 10:00   | 2020-06-07 14:30   | Air Leak   | High Stress  | Maintenance on 2020-06-08 16:00 |
+| #4  | 2020-07-15 14:30   | 2020-07-15 19:00   | Air Leak   | High Stress  | Maintenance on 2020-07-16 00:00 |
+
 Has Missing Values?
 No
 
