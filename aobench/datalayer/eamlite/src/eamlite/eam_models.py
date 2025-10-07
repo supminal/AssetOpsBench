@@ -350,10 +350,12 @@ class Assetmeters(SQLModel, table=True):
     meterreading: Optional[decimal.Decimal] = Field(
         default=None, sa_column=Column("meterreading", Numeric(10, 2))
     )
-    readingdate: Optional[datetime.date] = Field(
+    readingdate: Optional[datetime.datetime] = Field(
         default=None, sa_column=Column("readingdate", Date)
     )
-
+    metername: Optional[str] = Field(
+        default=None, sa_column=Column("metername", String(50))
+    )
     assets: Optional["Assets"] = Relationship(back_populates="assetmeters")
 
 
