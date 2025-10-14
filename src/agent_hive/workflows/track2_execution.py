@@ -78,7 +78,41 @@ class TaskRevisionHelperAgent(BaseAgent):
         #
         # 👉 IMPORTANT: Do NOT modify anything outside this method
         # =========================================================
-        raise NotImplementedError("Participants must implement this method.")
+        
+        # Quality assessment
+        response_length = len(task_input.strip())
+        has_data = any(keyword in task_input.lower() for keyword in 
+                      ['found', 'data', 'value', 'result', 'output', 'analysis'])
+        has_error = any(keyword in task_input.lower() for keyword in 
+                       ['error', 'failed', 'unable', 'could not', 'exception'])
+        
+        # Quality score (0-10)
+        quality_score = 0
+        if response_length > 50:
+            quality_score += 3
+        if response_length > 150:
+            quality_score += 2
+        if has_data:
+            quality_score += 3
+        if not has_error:
+            quality_score += 2
+        
+        # If quality is acceptable, return as-is with minimal formatting
+        if quality_score >= 6:
+            # Clean up the response
+            cleaned_response = task_input.strip()
+            # Remove any residual "Final Answer:" prefixes if present
+            if "Final Answer:" in cleaned_response:
+                cleaned_response = cleaned_response.split("Final Answer:")[-1].strip()
+            return cleaned_response
+        
+        # For low quality responses, add context markers
+        if has_error:
+            return f"⚠️ Task execution encountered issues:\n{task_input.strip()}"
+        elif response_length < 50:
+            return f"ℹ️ Brief response received:\n{task_input.strip()}"
+        else:
+            return task_input.strip()
 
 
 class DynamicWorkflow(Workflow):
@@ -155,6 +189,10 @@ class DynamicWorkflow(Workflow):
         self.context_type = ContextType.SELECTED
         max_loops = 15
         i = 0
+        
+        # Initialize helper agent for response quality improvement
+        helper = TaskRevisionHelperAgent()
+        
         while i < len(self.tasks) and i < max_loops:
             task = self.tasks[i]
             task_no = i + 1
@@ -165,16 +203,59 @@ class DynamicWorkflow(Workflow):
             # Build input with context
             user_input = self._build_input(task, i)
 
-            # Baseline: Execute with first agent
-            response = assigned_agents[0].execute_task(user_input)
+            # Strategy: Use multiple agents with fallback
+            response = None
+            execution_success = False
+            
+            # Try primary agent first
+            try:
+                logger.info(f"Executing with primary agent: {assigned_agents[0].name}")
+                response = assigned_agents[0].execute_task(user_input)
+                
+                # Quality check on response
+                response_quality = self._assess_response_quality(response)
+                
+                if response_quality >= 0.6:  # Quality threshold
+                    execution_success = True
+                    logger.info(f"Primary agent succeeded with quality score: {response_quality:.2f}")
+                else:
+                    logger.info(f"Primary agent response quality low: {response_quality:.2f}")
+                    
+            except Exception as e:
+                logger.warning(f"Primary agent failed: {e}")
+            
+            # Fallback strategy: If primary agent failed or low quality, try secondary agents
+            if not execution_success and len(assigned_agents) > 1:
+                for fallback_idx in range(1, min(len(assigned_agents), 3)):  # Try up to 2 fallback agents
+                    try:
+                        logger.info(f"Trying fallback agent {fallback_idx}: {assigned_agents[fallback_idx].name}")
+                        fallback_response = assigned_agents[fallback_idx].execute_task(user_input)
+                        
+                        fallback_quality = self._assess_response_quality(fallback_response)
+                        
+                        if fallback_quality > self._assess_response_quality(response or ""):
+                            response = fallback_response
+                            execution_success = True
+                            logger.info(f"Fallback agent {fallback_idx} provided better response")
+                            break
+                    except Exception as e:
+                        logger.warning(f"Fallback agent {fallback_idx} failed: {e}")
+                        continue
+            
+            # If still no good response, use original or empty
+            if response is None:
+                response = "Task execution did not produce a valid response."
+                logger.warning(f"Task {task_no} completed with no valid response")
 
-            # 👉 OPTIONAL: Use TaskRevisionHelperAgent here
-            # helper = TaskRevisionHelperAgent()
-            # response = helper.execute_task(response)
-
-            # 👉 OPTIONAL: Combine or compare multiple agent responses
-            response = response.replace("Final Answer:","").strip()
+            # Use helper agent to clean and validate the response
+            response = helper.execute_task(response)
+            
+            # Clean up any remaining "Final Answer:" artifacts
+            response = response.replace("Final Answer:", "").strip()
+            
+            # Store in memory
             self.memory.append(response)
+            logger.info(f"Task {task_no} completed. Response length: {len(response)}")
 
             i += 1
 
@@ -182,6 +263,51 @@ class DynamicWorkflow(Workflow):
         print(json.dumps(history, indent=4))
         return history
 
+    def _assess_response_quality(self, response: str) -> float:
+        """
+        Assess the quality of a response on a scale of 0.0 to 1.0.
+        Helper method for fallback strategy.
+        """
+        if not response or len(response.strip()) == 0:
+            return 0.0
+        
+        quality_score = 0.0
+        response_lower = response.lower()
+        
+        # Length factor (up to 0.3)
+        length = len(response.strip())
+        if length > 200:
+            quality_score += 0.3
+        elif length > 100:
+            quality_score += 0.2
+        elif length > 50:
+            quality_score += 0.1
+        
+        # Data presence (up to 0.3)
+        data_keywords = ['found', 'data', 'value', 'result', 'output', 'analysis', 
+                        'temperature', 'pressure', 'status', 'reading', 'measurement']
+        data_count = sum(1 for keyword in data_keywords if keyword in response_lower)
+        quality_score += min(0.3, data_count * 0.1)
+        
+        # Error indicators (negative score, up to -0.4)
+        error_keywords = ['error', 'failed', 'unable', 'could not', 'exception', 
+                         'not found', 'invalid', 'no data']
+        error_count = sum(1 for keyword in error_keywords if keyword in response_lower)
+        quality_score -= min(0.4, error_count * 0.15)
+        
+        # Completeness indicators (up to 0.2)
+        if any(word in response_lower for word in ['completed', 'success', 'retrieved', 'identified']):
+            quality_score += 0.2
+        
+        # Structure indicators (up to 0.2)
+        if '\n' in response or ',' in response or ':' in response:
+            quality_score += 0.1
+        if any(char.isdigit() for char in response):
+            quality_score += 0.1
+        
+        # Ensure score is between 0 and 1
+        return max(0.0, min(1.0, quality_score))
+    
     def _build_input(self, task: Task, idx: int) -> str:
         """Helper to build task input string based on context type."""
         if self.context_type == ContextType.DISABLED:
